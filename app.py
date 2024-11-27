@@ -2,6 +2,7 @@ import os
 from pydub import AudioSegment
 from pydub.utils import which
 import streamlit as st
+import subprocess
 
 # Configurar o caminho para o FFmpeg
 AudioSegment.converter = which("ffmpeg")
@@ -50,6 +51,19 @@ def dividir_audio_em_partes(input_file, output_folder, max_size_mb=10):
     print(f"Divisão concluída. Total de partes: {num_parts}")
     return num_parts
 
+# Função para executar o script adicional
+def run_script(script_path):
+    try:
+        result = subprocess.run(['python', script_path], capture_output=True, text=True)
+        # Exibir a saída do script
+        if result.returncode == 0:
+            print("Script adicional executado com sucesso!")
+            print(result.stdout)  # Exibir saída do script, se necessário
+        else:
+            print(f"Erro ao executar o script: {result.stderr}")  # Exibir erro, se houver
+    except Exception as e:
+        print(f"Erro ao executar o script adicional: {e}")
+
 # Interface do Streamlit
 st.title("Divisor de Áudio")
 st.write("Carregue um arquivo de áudio para dividi-lo em partes menores.")
@@ -80,10 +94,10 @@ if uploaded_file:
                 st.download_button(label=f"Baixar {part_file}", data=f, file_name=part_file)
     except Exception as e:
         st.error(f"Erro ao processar o arquivo: {e}")
-
     
     # Executar outro script após a divisão
     if st.button("Executar Script Adicional"):
         script_path = "novo-baserow.py"  # Altere para o caminho do script adicional
         run_script(script_path)
         st.success("Script adicional executado com sucesso!")
+
