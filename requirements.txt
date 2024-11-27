@@ -1,0 +1,7 @@
+os
+pydub
+streamlit
+AudioSegment
+subprocess
+streamlit
+requests
