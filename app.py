@@ -1,41 +1,39 @@
 import streamlit as st
-from pydub import AudioSegment
+from moviepy.editor import AudioFileClip
 import os
 import shutil
 import warnings
 
-# Suprimir SyntaxWarnings
-warnings.filterwarnings("ignore", category=SyntaxWarning)
-
-# Verificar caminho do ffprobe
-ffprobe_path = shutil.which("ffprobe")
+# Verificar instalação do ffmpeg
+import ffmpeg
 ffmpeg_path = shutil.which("ffmpeg")
 
-if ffprobe_path and ffmpeg_path:
-    AudioSegment.ffprobe = ffprobe_path
-    AudioSegment.ffmpeg = ffmpeg_path
+if ffmpeg_path:
+    st.write(f"FFmpeg encontrado no caminho: {ffmpeg_path}")
 else:
-    st.error("FFmpeg ou FFprobe não encontrado. Verifique a configuração do ambiente.")
+    st.error("FFmpeg não encontrado. Verifique a configuração do ambiente.")
 
-# Função para dividir áudio
+# Função para dividir áudio em partes
 def dividir_audio_em_partes(input_file, output_folder, max_size_mb):
     try:
-        audio = AudioSegment.from_file(input_file)
+        # Carregar o áudio usando moviepy
+        audio = AudioFileClip(input_file)
     except Exception as e:
         raise Exception(f"Erro ao carregar o arquivo de áudio: {e}")
 
-    total_duration = len(audio)  # em milissegundos
+    total_duration = audio.duration  # em segundos
     max_size_bytes = max_size_mb * 1024 * 1024
 
-    part_duration = (max_size_bytes / audio.frame_rate / audio.frame_width) * 1000
+    # Estimando a duração de cada parte com base no tamanho do arquivo
+    part_duration = (max_size_bytes / audio.fps / audio.reader.nchannels) / audio.reader.bytes_per_sample
     num_parts = int(total_duration / part_duration) + 1
 
     for i in range(num_parts):
-        start = int(i * part_duration)
-        end = int(min((i + 1) * part_duration, total_duration))
-        part = audio[start:end]
+        start = i * part_duration
+        end = min((i + 1) * part_duration, total_duration)
+        part = audio.subclip(start, end)
         output_path = os.path.join(output_folder, f"part_{i + 1}.mp3")
-        part.export(output_path, format="mp3")
+        part.write_audiofile(output_path, codec="libmp3lame")
 
     return num_parts
 
