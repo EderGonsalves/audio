@@ -3,6 +3,10 @@ from pydub import AudioSegment
 from pydub.utils import which
 import streamlit as st
 import subprocess
+import warnings
+
+warnings.filterwarnings("ignore", category=SyntaxWarning)
+
 
 # Configurar o caminho para o FFmpeg
 AudioSegment.converter = which("ffmpeg")
