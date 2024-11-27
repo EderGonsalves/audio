@@ -3,3 +3,4 @@ streamlit
 AudioSegment
 requests
 imageio[ffmpeg]
+ffmpeg-python
