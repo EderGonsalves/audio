@@ -7,6 +7,10 @@ import warnings
 
 warnings.filterwarnings("ignore", category=SyntaxWarning)
 
+# Verificar caminho do ffprobe
+ffprobe_path = shutil.which("ffprobe")
+ffmpeg_path = shutil.which("ffmpeg")
+
 
 # Configurar o caminho para o FFmpeg
 AudioSegment.converter = which("ffmpeg")
