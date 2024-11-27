@@ -1,6 +1,4 @@
-pydub
 streamlit
-AudioSegment
-requests
-imageio[ffmpeg]
+pydub
 ffmpeg-python
+moviepy
