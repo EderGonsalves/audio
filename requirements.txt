@@ -2,3 +2,4 @@ pydub
 streamlit
 AudioSegment
 requests
+imageio[ffmpeg]
