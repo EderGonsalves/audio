@@ -1,0 +1,26 @@
+version: "3.8"
+networks:
+  minha_rede:
+    external: true
+
+services:
+  api-audio:
+    image: audio:latest
+    ports:
+      - "5001:5001"
+    networks:
+      - minha_rede
+    deploy:
+      replicas: 1  # Define a quantidade de replicas (opcional, mas recomendado)
+      restart_policy:
+        condition: on-failure
+    volumes:
+      - static:/app/static
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api-audio.rule=Host(`flow.konecta.pro`)"
+      - "traefik.http.services.api-audio.loadbalancer.server.port=5001"
+    # Correção: O comando gunicorn deve estar aqui
+    #command: uwsgi --ini /app/uwsgi.ini
+volumes:
+  static:
